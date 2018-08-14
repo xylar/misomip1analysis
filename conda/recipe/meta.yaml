@@ -1,0 +1,46 @@
+{% set version = "1.0.0" %}
+
+package:
+    name: misomip1analysis
+    version: {{ version }}
+
+source:
+    path: ../..
+
+build:
+    number: 0
+    script: $PYTHON setup.py install --single-version-externally-managed
+            --record=record.txt
+    noarch: python
+
+test:
+    imports:
+        - misomip1analysis
+    commands:
+        - misomip1analysis --version
+
+requirements:
+    build:
+        - python
+        - setuptools
+    run:
+        - python
+        - cython
+        - setuptools
+        - numpy
+        - scipy
+        - matplotlib
+        - netcdf4
+        - xarray
+        - progressbar2
+
+about:
+    home:  http://gitub.com/xylar/misomip1analysis
+    license: MIT
+    license_file: LICENSE
+    summary: 'A python package for analyzing MISOMIP1 and ISOMIP+ simulation results'
+
+extra:
+    recipe-maintainers:
+        - xylar
+
