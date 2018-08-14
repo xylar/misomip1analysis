@@ -8,6 +8,7 @@ import pkg_resources
 from configparser import ConfigParser
 
 import misomip1analysis
+from misomip1analysis.plot.metrics import plot_metric_timeseries
 
 
 def main():
@@ -42,6 +43,8 @@ def main():
 
     config = ConfigParser()
     config.read(configFiles)
+
+    plot_metric_timeseries(config)
 
 
 if __name__ == "__main__":
