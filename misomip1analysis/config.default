@@ -1,0 +1,16 @@
+## This file contains the default values of all possible configuration options
+## used to run analysis.  Do not modify options in this file direct.
+## Instead, follow this procedure:
+##  1. Create and empty config file (say config.myrun).
+##  2. Copy and modify any config options you want to change from this file into
+##     into your new config file.
+##  3. run: misomip1analysis config.myrun.  This will read the configuraiton
+##     first from this file and then replace that configuraiton with any
+##     changes from from config.myrun
+
+[experiment]
+## Options related to the experiment being analyzed
+
+# The name of the experiment (one of Ocean0-4 or IceOcean1-2)
+name = Ocean0
+
