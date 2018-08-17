@@ -1,32 +1,49 @@
 import xarray
 
-from misomip1analysis.util import get_config_list
+from misomip1analysis.util import string_to_list
+
+from collections import OrderedDict
+
 
 def load_datasets(config, variableList=None):
     '''
-    Load model data for a given set of variables (or all variables if
-    ``variableList=None``).
+    Load model data
+
+    Parameters
+    ----------
+    config : ConfigParser
+        config options
+
+    variableList : list of str, optional
+        a list of variables to keep from each model.  By default, all variables
+        are kept.
+
+    Returns
+    -------
+    datasets : OrderedDict of xarray.Dataset
+        A dictionary with one data set for each model
+
+    maxTime : int
+        The value of nTime from the longest model data set
     '''
 
-    modelNames = get_config_list(config, 'models', 'names')
+    modelNames = string_to_list(config['models']['names'])
 
-    experimentName = config.get('experiment', 'name')
+    experimentName = config['experiment']['name']
 
-    if config.has_option('experiment', 'setup'):
-        setupName = config.get('experiment', 'setup')
+    if 'setup' in config['experiment']:
+        setupPrefix = '{}_'.format(config['experiment']['setup'])
     else:
-        setupName = None
+        setupPrefix = ''
 
-    datasets = {}
+    datasets = OrderedDict()
+    maxTime = None
     for modelName in modelNames:
-        if setupName is None:
-            fileName = '{}/{}_{}.nc'.format(modelName, experimentName,
-                                            modelName)
-        else:
-            fileName = '{}/{}_{}_{}.nc'.format(modelName, experimentName,
-                                               setupName, modelName)
+        fileName = '{}/{}_{}{}.nc'.format(modelName, experimentName,
+                                          setupPrefix, modelName)
 
-        ds = xarray.open_dataset(fileName)
+        ds = xarray.open_dataset(fileName, mask_and_scale=True, decode_cf=True,
+                                 decode_times=False, engine='netcdf4')
         ds = ds.set_coords(['time', 'x', 'y', 'z'])
 
         if variableList is not None:
@@ -34,4 +51,16 @@ def load_datasets(config, variableList=None):
             ds = ds.drop(dropList)
         datasets[modelName] = ds
 
-    return datasets
+        # many MISOMIP output files don't have the _FillValue flag set properly
+        missingValue = 9.9692099683868690e36
+        for variableName in ds.data_vars:
+            var = ds[variableName]
+            ds[variableName] = var.where(var != missingValue)
+
+        nTime = ds.sizes['nTime']
+        if maxTime is None:
+            maxTime = nTime
+        else:
+            maxTime = max(maxTime, nTime)
+
+    return datasets, maxTime

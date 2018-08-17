@@ -25,6 +25,22 @@ setup = COM
 names = MPAS-Ocean, POP2x
 
 
+[constants]
+## Constants used as conversion factors, limits, etc.
+
+# seconds per year (to scale time)
+sPerYr = 31536000.
+
+# m/s --> m/yr
+meltRateScale = ${sPerYr}
+
+# kg/s --> GT/yr
+meltFluxScale = 31536000e-12
+
+# m^3/s --> Sv
+streamfunctionScale = 1e-6
+
+
 [metrics]
 ## Options related to global metrics
 
@@ -33,7 +49,7 @@ names = meanMeltRate, totalMeltFlux, totalOceanVolume, meanTemperature,
         meanSalinity
 
 # An output folder for plots of metric time-series
-folder = COM_Ocean0-2_plots
+folder = analysis/${experiment:name}_${experiment:setup}
 
 # A comma-separated list of colors, enough to cover all models
 colors = gray, darkred, r, orange, gold, y, g, c, b, purple, m, k, brown
@@ -56,23 +72,21 @@ lineWidth = 2
 semilog = False
 
 # A scaling factor between the input and plotted data
-# m/s --> m/a
-scale = 31536000.
+scale = ${constants:meltRateScale}
 
 # The y-axis label of the plot
 title = mean melt rate (m/a)
 
 [totalMeltFlux]
 semilog = False
-# kg/s --> GT/a
-scale = 31536000e-12
+scale = ${constants:meltFluxScale}
 title = total melt flux (GT/a)
 
 [totalOceanVolume]
 semilog = False
 # m^3 --> 1000 km^3
 scale = 1e-12
-title = total ocean volume (1000 km$^3$)
+title = total ocean volume (1000 km$$^3$$)
 
 [meanTemperature]
 semilog = False
@@ -83,3 +97,131 @@ title = mean temperature (C)
 semilog = False
 scale = 1.
 title = mean salinity (PSU)
+
+
+[movies]
+## Options related to plotting time slices as movie frames and making movies
+## with ffmpeg
+
+# fields to plot
+fields = meltRate, thermalDriving, halineDriving, frictionVelocity,
+         bottomTemperature, bottomSalinity, uBoundaryLayer, vBoundaryLayer,
+         barotropicStreamfunction, overturningStreamfunction, temperatureXZ,
+         salinityXZ, temperatureYZ, salinityYZ
+
+# An output folder for movie files
+folder = analysis/${experiment:name}_${experiment:setup}
+
+# An output folder for movie frames (with each field going in a subfolder)
+framesFolder = analysis/${experiment:name}_${experiment:setup}/frames
+
+# Temperature, salinity and velocity limits for color bars
+Tlimits = -2.5, 1.1
+Slimits = 33.6, 34.8
+Vlimits = -0.5, 0.5
+
+[ffmpeg]
+## Options related to converting frames to movies wiht ffmpeg
+# Path to ffmpeg, default is that it is assumed to be in the path
+path = ffmpeg
+
+# ffmpeg input and output arguments
+input = -r 30
+output = -b:v 32000k -r 30
+
+# A comma-separated list of movie types (extensions) to output
+extensions = mp4, avi
+
+
+## Options related to individual movie fields
+
+[meltRate]
+# y-axis limits as a comma-separated list
+limits = -100., 100.
+
+# scale factor that converts the output units to those of the plot
+scale = ${constants:meltRateScale}
+
+# title of the plot
+title = melt rate (m/a water equiv.)
+
+# axis of the plot (xy, xz or yz)
+axes = xy
+
+[thermalDriving]
+limits = -1., 1.
+scale = 1.
+title = thermal driving (C)
+axes = xy
+
+[halineDriving]
+limits = -10., 10.
+scale = 1.
+title = haline driving (PSU)
+axes = xy
+
+[frictionVelocity]
+limits = 0, 0.02
+scale = 1.
+title = friction velocity (m/s)
+axes = xy
+
+[bottomTemperature]
+limits = ${movies:Tlimits}
+scale = 1.
+title = sea-floor temperature (C)
+axes = xy
+
+[bottomSalinity]
+limits = ${movies:Slimits}
+scale = 1.
+title = sea-floor salinity (PSU)
+axes = xy
+
+[uBoundaryLayer]
+limits = ${movies:Vlimits}
+scale = 1.
+title = x-velocity (m/s) in the sub-shelf boundary layer
+axes = xy
+
+[vBoundaryLayer]
+limits = ${movies:Vlimits}
+scale = 1.
+title = y-velocity (m/s) in the sub-shelf boundary layer
+axes = xy
+
+[barotropicStreamfunction]
+limits = -0.3, 0.3
+scale = ${constants:streamfunctionScale}
+title = barotropic streamfunction (Sv)
+axes = xy
+
+[overturningStreamfunction]
+limits = -0.2, 0.2
+scale = ${constants:streamfunctionScale}
+title = overturning streamfunction (Sv)
+axes = xz
+
+[temperatureXZ]
+limits = ${movies:Tlimits}
+scale = 1.
+title = temperature (C) sliced through y=40 km
+axes = xz
+
+[salinityXZ]
+limits = ${movies:Slimits}
+scale = 1.
+title = salinity (PSU) sliced through y=40 km
+axes = xz
+
+[temperatureYZ]
+limits = ${movies:Tlimits}
+scale = 1.
+title = temperature (C) sliced through x=540 km
+axes = yz
+
+[salinityYZ]
+limits = ${movies:Slimits}
+scale = 1.
+title = salinity (PSU) sliced through x=540 km
+axes = yz

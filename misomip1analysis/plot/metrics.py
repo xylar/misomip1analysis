@@ -1,6 +1,5 @@
 from misomip1analysis.models import load_datasets
-from misomip1analysis.util import get_config_list
-from misomip1analysis import constants
+from misomip1analysis.util import string_to_list
 
 import os
 import matplotlib
@@ -18,37 +17,31 @@ def plot_metric_timeseries(config):
         config options
     '''
 
-    experiment = config.get('experiment', 'name')
-    modelNames = get_config_list(config, 'models', 'names')
+    experiment = config['experiment']['name']
 
-    metricNames = get_config_list(config, 'metrics', 'names')
-    plotFolder = config.get('metrics', 'folder')
+    metrics = config['metrics']
+    metricNames = string_to_list(metrics['names'])
+    plotFolder = metrics['folder']
 
     try:
         os.makedirs(plotFolder)
     except OSError:
         pass
 
-    colors = get_config_list(config, 'metrics', 'colors')
-    dpi = config.getint('metrics', 'dpi')
-    lineWidth = config.getint('metrics', 'lineWidth')
-    figsize = get_config_list(config, 'metrics', 'figsize')
+    colors = string_to_list(metrics['colors'])
+    dpi = metrics.getint('dpi')
+    lineWidth = metrics.getint('lineWidth')
+    figsize = string_to_list(metrics['figsize'])
     figsize = [float(dim) for dim in figsize]
 
-    datasets = load_datasets(config, variableList=metricNames)
-
-    maxTime = None
-    for modelName in modelNames:
-        nTime = datasets[modelName].sizes['nTime']
-        if maxTime is None:
-            maxTime = nTime
-        else:
-            maxTime = max(maxTime, nTime)
+    datasets, maxTime = load_datasets(config, variableList=metricNames)
+    modelNames = list(datasets.keys())
 
     for metricName in metricNames:
-        semilog = config.getboolean(metricName, 'semilog')
-        scale = config.getfloat(metricName, 'scale')
-        title = config.get(metricName, 'title')
+        metricConfig = config[metricName]
+        semilog = metricConfig.getboolean('semilog')
+        scale = metricConfig.getfloat('scale')
+        title = metricConfig['title']
 
         plt.figure(figsize=figsize)
         for modelIndex, modelName in enumerate(modelNames):
@@ -56,7 +49,7 @@ def plot_metric_timeseries(config):
             if metricName not in ds.data_vars:
                 continue
 
-            years = ds.time.values/constants.sPerYr
+            years = ds.time.values/config['constants'].getfloat('sPerYr')
             field = scale*ds[metricName].values
             if semilog:
                 plt.semilogy(years, field, label=modelName,

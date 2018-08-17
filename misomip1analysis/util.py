@@ -1,6 +1,5 @@
 
-def get_config_list(config, section, option):
-
-    string = config.get(section, option)
-    stringList = [sub.strip() for sub in string.split(',')]
+def string_to_list(string, separator=','):
+    '''convert a string to a list of (stripped) strings, given a separator'''
+    stringList = [sub.strip() for sub in string.split(separator)]
     return stringList

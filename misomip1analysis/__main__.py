@@ -5,10 +5,11 @@ Script for starting MISOMIP1 analysis
 import os
 import argparse
 import pkg_resources
-from configparser import ConfigParser
+from configparser import ConfigParser, ExtendedInterpolation
 
 import misomip1analysis
 from misomip1analysis.plot.metrics import plot_metric_timeseries
+from misomip1analysis.plot.movies import plot_movies
 
 
 def main():
@@ -41,10 +42,11 @@ def main():
         defaultConfig = None
         configFiles = args.configFiles
 
-    config = ConfigParser()
+    config = ConfigParser(interpolation=ExtendedInterpolation())
     config.read(configFiles)
 
     plot_metric_timeseries(config)
+    plot_movies(config)
 
 
 if __name__ == "__main__":
