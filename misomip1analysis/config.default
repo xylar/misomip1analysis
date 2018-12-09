@@ -120,6 +120,10 @@ Tlimits = -2.5, 1.1
 Slimits = 33.6, 34.8
 Vlimits = -0.5, 0.5
 
+# Start and end year
+startYear = 0
+endYear = 10000
+
 [ffmpeg]
 ## Options related to converting frames to movies wiht ffmpeg
 # Path to ffmpeg, default is that it is assumed to be in the path

@@ -46,12 +46,17 @@ def plot_movie(config, fieldName):
 
     datasets, maxTime = load_datasets(config, variableList=[fieldName])
 
-    widgets = [fieldName, Percentage(), ' ', Bar(), ' ', ETA()]
-    time_bar = ProgressBar(widgets=widgets, maxval=maxTime).start()
+    movies = config['movies']
+    tIndexStart = int(12*movies.getfloat('startYear')+0.5)
+    tIndexEnd = min(maxTime, int(12*(movies.getfloat('endYear')+1)+0.5))
 
-    for timeIndex in range(maxTime):
+    widgets = [fieldName, Percentage(), ' ', Bar(), ' ', ETA()]
+    time_bar = ProgressBar(widgets=widgets,
+                           maxval=(tIndexEnd-tIndexStart)).start()
+
+    for timeIndex in range(tIndexStart, tIndexEnd):
         _plot_time_slice(config, fieldName, datasets, timeIndex)
-        time_bar.update(timeIndex+1)
+        time_bar.update(timeIndex-tIndexStart+1)
 
     time_bar.finish()
 
@@ -147,7 +152,7 @@ def _plot_time_slice(config, fieldName, datasets, timeIndex):
         modelName = modelNames[modelIndex]
         ds = datasets[modelName]
 
-        localTimeIndex = min(timeIndex, ds.dims['nTime']-1)
+        localTimeIndex = min(timeIndex, ds.sizes['nTime']-1)
         ds = ds.isel(nTime=localTimeIndex)
         year = ds.time.values/config['constants'].getfloat('sPerYr')
 
@@ -227,7 +232,7 @@ def _plot_panel(ax, field, label, scale, lower, upper, extent, axes):
     field = numpy.ma.masked_array(field, mask=numpy.isnan(field),
                                   dtype=float)
 
-    field *= scale
+    field = field*scale
 
     # plot the data as an image
     im = ax.imshow(field, extent=extent, cmap='ferret', vmin=lower, vmax=upper,
