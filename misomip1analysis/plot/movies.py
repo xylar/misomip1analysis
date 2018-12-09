@@ -302,9 +302,9 @@ def _register_ferret_colormap():
                          [1, 0]])
 
     blue = numpy.array([[0, 0],
-                       [0.5, 0],
-                       [0.9, 0.9],
-                       [1, 0.9]])
+                        [0.5, 0],
+                        [0.9, 0.9],
+                        [1, 0.9]])
 
     # light gray for use as an "invalid" background value wherever
     # data has been masked out in the NetCDF file
