@@ -2,8 +2,6 @@ from misomip1analysis.models import load_datasets
 from misomip1analysis.util import string_to_list
 
 import os
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
