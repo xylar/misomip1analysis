@@ -1,4 +1,5 @@
 import xarray
+import numpy
 
 from misomip1analysis.util import string_to_list
 
@@ -57,10 +58,22 @@ def load_datasets(config, variableList=None):
             var = ds[variableName]
             ds[variableName] = var.where(var != missingValue)
 
-        nTime = ds.sizes['nTime']
+        # fix time if the middle of the month was used instead of the beginning
+        time = ds.time.values
+        secondsInJanuary = 31*24*60*60
+        if numpy.abs(time[0]/secondsInJanuary - 0.5) < 1e-3:
+            # very close to 1/2 month beyond where it should be, so let's
+            # assume a consistant half-month offset
+            daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            for tIndex in range(len(time)):
+                month = numpy.mod(tIndex, 12)
+                time[tIndex] -= 0.5*daysPerMonth[month]*24*60*60
+
+            ds['time'] = ('time', time)
+
         if maxTime is None:
-            maxTime = nTime
+            maxTime = numpy.amax(time)
         else:
-            maxTime = max(maxTime, nTime)
+            maxTime = max(maxTime, numpy.amax(time))
 
     return datasets, maxTime

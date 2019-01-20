@@ -43,26 +43,44 @@ def plot_movie(config, fieldName):
         A field in the model output that can be plotted as a movie
     '''
 
+    daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    secondsPerDay = 24.*60.*60.
+    secondsPerYear = 365.*secondsPerDay
+
     datasets, maxTime = load_datasets(config, variableList=[fieldName])
 
     movies = config['movies']
-    tIndexStart = int(12*movies.getfloat('startYear')+0.5)
-    tIndexEnd = min(maxTime, int(12*(movies.getfloat('endYear')+1)+0.5))
+    startTime = movies.getfloat('startYear')*secondsPerYear
+    endTime = min(maxTime, (movies.getfloat('endYear')+1)*secondsPerYear)
+
+    maxYear = int(numpy.ceil(maxTime/secondsPerYear))
+    refTime = []
+    for year in range(maxYear+1):
+        refTime.append(year*secondsPerYear)
+        for month in range(1, 12):
+            refTime.append(refTime[-1]+daysPerMonth[month-1]*secondsPerDay)
+
+    refTime = numpy.array(refTime)
+    timeIndices = numpy.arange(len(refTime))
+    mask = numpy.logical_and(refTime >= startTime, refTime < endTime)
+    refTime = refTime[mask]
+    timeIndices = timeIndices[mask]
 
     widgets = [fieldName, Percentage(), ' ', Bar(), ' ', ETA()]
     time_bar = ProgressBar(widgets=widgets,
-                           maxval=(tIndexEnd-tIndexStart)).start()
+                           maxval=len(refTime)).start()
 
-    for timeIndex in range(tIndexStart, tIndexEnd):
-        _plot_time_slice(config, fieldName, datasets, timeIndex)
-        time_bar.update(timeIndex-tIndexStart+1)
+    for index in range(len(refTime)):
+        _plot_time_slice(config, fieldName, datasets, refTime[index],
+                         timeIndices[index])
+        time_bar.update(index+1)
 
     time_bar.finish()
 
     _frames_to_movie(config, fieldName)
 
 
-def _plot_time_slice(config, fieldName, datasets, timeIndex):
+def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     '''
     Plot the frames of a movie from a time-dependent, spatially 2D field and
     then create a movie using ffmpeg (if available)
@@ -78,8 +96,8 @@ def _plot_time_slice(config, fieldName, datasets, timeIndex):
     datasets : dict of xarray.Dataset
         The data sets to plot
 
-    timeIndex : int
-        The index into the time series to plot
+    time : float
+        The time to plot (by finding the nearest index in the time coordinate)
     '''
     framesFolder = config['movies']['framesFolder']
     framesFolder = '{}/{}'.format(framesFolder, fieldName)
@@ -151,9 +169,12 @@ def _plot_time_slice(config, fieldName, datasets, timeIndex):
         modelName = modelNames[modelIndex]
         ds = datasets[modelName]
 
-        localTimeIndex = min(timeIndex, ds.sizes['nTime']-1)
+        times = ds.time.values
+        localTimeIndex = numpy.interp(time, times,
+                                      numpy.arange(ds.sizes['nTime']))
+        localTimeIndex = int(localTimeIndex + 0.5)
         ds = ds.isel(nTime=localTimeIndex)
-        year = ds.time.values/config['constants'].getfloat('sPerYr')
+        year = times[localTimeIndex]/config['constants'].getfloat('sPerYr')
 
         # convert x and y to km
         ranges = {}
