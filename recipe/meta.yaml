@@ -5,11 +5,11 @@ package:
     version: {{ version }}
 
 source:
-    path: ../..
+    path: ..
 
 build:
     number: 0
-    script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv"
+    script: {{ PYTHON }} -m pip install . --no-deps -vv
     noarch: python
 
 test:
@@ -19,25 +19,25 @@ test:
         - misomip1analysis --version
 
 requirements:
-    build:
+    host:
         - python
-        - setuptools
+        - pip
     run:
         - python
-        - cython
-        - setuptools
         - numpy
         - scipy
         - matplotlib
         - netcdf4
         - xarray
         - progressbar2
+        - ffmpeg
+        - cmocean
 
 about:
     home:  http://gitub.com/xylar/misomip1analysis
     license: MIT
     license_file: LICENSE
-    summary: 'A python package for analyzing MISOMIP1 and ISOMIP+ simulation results'
+    summary: A python package for analyzing MISOMIP1 and ISOMIP+ simulation results
 
 extra:
     recipe-maintainers:
