@@ -2,8 +2,8 @@ import os
 import numpy
 from progressbar import ProgressBar, Percentage, Bar, ETA
 import subprocess
-from distutils.spawn import find_executable
 
+import cmocean
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from matplotlib.cm import register_cmap
@@ -25,6 +25,7 @@ def plot_movies(config):
     _register_ferret_colormap()
 
     fieldNames = string_to_list(config['movies']['fields'])
+
     for fieldName in fieldNames:
         plot_movie(config, fieldName)
 
@@ -32,7 +33,7 @@ def plot_movies(config):
 def plot_movie(config, fieldName):
     """
     Plot the frames of a movie from a time-dependent, spatially 2D field and
-    then create a movie using ffmpeg (if available)
+    then create a movie using ffmpeg
 
     Parameters
     ----------
@@ -83,7 +84,7 @@ def plot_movie(config, fieldName):
 def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     """
     Plot the frames of a movie from a time-dependent, spatially 2D field and
-    then create a movie using ffmpeg (if available)
+    then create a movie using ffmpeg
 
     Parameters
     ----------
@@ -119,6 +120,10 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     axes = section['axes']
     title = section['title']
     scale = section.getfloat('scale')
+    if 'cmap' in section:
+        cmap = section['cmap']
+    else:
+        cmap = 'ferret'
     lower, upper = [float(limit) for limit in
                     string_to_list(section['limits'])]
 
@@ -179,9 +184,12 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
 
         # convert x and y to km
         ranges = {}
-        for varName in ['x', 'y']:
-            ranges[varName] = [1e-3*ds[varName].min(), 1e-3*ds[varName].max()]
-        ranges['z'] = [ds.z.min(), ds.z.max()]
+        for coordName in ['x', 'y']:
+            if coordName in ds:
+                ranges[coordName] = [1e-3*ds[coordName].min(),
+                                     1e-3*ds[coordName].max()]
+        if 'z' in ds:
+            ranges['z'] = [ds.z.min(), ds.z.max()]
 
         extent = []
         for axis in axes:
@@ -195,7 +203,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
         ax = axarray[row, col]
 
         im = _plot_panel(ax, ds[fieldName].values, '{:.2f} a'.format(year),
-                         scale, lower, upper, extent, axes)
+                         scale, lower, upper, extent, axes, cmap)
 
         if row == rowCount-1:
             ax.set_xlabel(xLabel)
@@ -234,7 +242,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     plt.close()
 
 
-def _plot_panel(ax, field, label, scale, lower, upper, extent, axes):
+def _plot_panel(ax, field, label, scale, lower, upper, extent, axes, cmap):
     """
     Plot a single panel for a given model in a movie frame
     """
@@ -256,7 +264,7 @@ def _plot_panel(ax, field, label, scale, lower, upper, extent, axes):
     field = field*scale
 
     # plot the data as an image
-    im = ax.imshow(field, extent=extent, cmap='ferret', vmin=lower, vmax=upper,
+    im = ax.imshow(field, extent=extent, cmap=cmap, vmin=lower, vmax=upper,
                    aspect=aspectRatio, interpolation='nearest')
 
     if axes == 'xy':
@@ -272,7 +280,7 @@ def _plot_panel(ax, field, label, scale, lower, upper, extent, axes):
 
 def _frames_to_movie(config, fieldName):
     """
-    create a movie from frames using ffmpeg (if available)
+    create a movie from frames using ffmpeg
 
     Parameters
     ----------
@@ -283,11 +291,6 @@ def _frames_to_movie(config, fieldName):
         A field in the model output that can be plotted as a movie
     """
     section = config['ffmpeg']
-    ffmpeg = section['path']
-    if find_executable(ffmpeg) is None:
-        print('WARNING: {} not found. Frames will not be converted to '
-              'movies.'.format(ffmpeg))
-        return
 
     experiment = config['experiment']['name']
     movieFolder = config['movies']['folder']
@@ -304,7 +307,7 @@ def _frames_to_movie(config, fieldName):
     extensions = string_to_list(section['extensions'])
 
     for extension in extensions:
-        args = [ffmpeg, '-y'] + inputArgs + ['-i', framesTemplate] + \
+        args = ['ffmpeg', '-y'] + inputArgs + ['-i', framesTemplate] + \
             outputArgs + ['{}/{}_{}.{}'.format(movieFolder, experiment,
                                                fieldName, extension)]
         subprocess.check_call(args)

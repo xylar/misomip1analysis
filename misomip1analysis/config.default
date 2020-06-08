@@ -126,8 +126,6 @@ endYear = 10000
 
 [ffmpeg]
 ## Options related to converting frames to movies wiht ffmpeg
-# Path to ffmpeg, default is that it is assumed to be in the path
-path = ffmpeg
 
 # ffmpeg input and output arguments
 input = -r 30
@@ -152,80 +150,96 @@ title = melt rate (m/a water equiv.)
 # axis of the plot (xy, xz or yz)
 axes = xy
 
+# the name of the colormap
+cmap = cmo.balance
+
 [thermalDriving]
 limits = -1., 1.
 scale = 1.
 title = thermal driving (C)
 axes = xy
+cmap = cmo.balance
 
 [halineDriving]
 limits = -10., 10.
 scale = 1.
 title = haline driving (PSU)
 axes = xy
+cmap = cmo.balance
 
 [frictionVelocity]
 limits = 0, 0.02
 scale = 1.
 title = friction velocity (m/s)
 axes = xy
+cmap = cmo.speed
 
 [bottomTemperature]
 limits = ${movies:Tlimits}
 scale = 1.
 title = sea-floor temperature (C)
 axes = xy
+cmap = cmo.thermal
 
 [bottomSalinity]
 limits = ${movies:Slimits}
 scale = 1.
 title = sea-floor salinity (PSU)
 axes = xy
+cmap = cmo.haline
 
 [uBoundaryLayer]
 limits = ${movies:Vlimits}
 scale = 1.
 title = x-velocity (m/s) in the sub-shelf boundary layer
 axes = xy
+cmap = cmo.delta
 
 [vBoundaryLayer]
 limits = ${movies:Vlimits}
 scale = 1.
 title = y-velocity (m/s) in the sub-shelf boundary layer
 axes = xy
+cmap = cmo.delta
 
 [barotropicStreamfunction]
 limits = -0.3, 0.3
 scale = ${constants:streamfunctionScale}
 title = barotropic streamfunction (Sv)
 axes = xy
+cmap = cmo.curl
 
 [overturningStreamfunction]
 limits = -0.2, 0.2
 scale = ${constants:streamfunctionScale}
 title = overturning streamfunction (Sv)
 axes = xz
+cmap = cmo.curl
 
 [temperatureXZ]
 limits = ${movies:Tlimits}
 scale = 1.
 title = temperature (C) sliced through y=40 km
 axes = xz
+cmap = cmo.thermal
 
 [salinityXZ]
 limits = ${movies:Slimits}
 scale = 1.
 title = salinity (PSU) sliced through y=40 km
 axes = xz
+cmap = cmo.haline
 
 [temperatureYZ]
 limits = ${movies:Tlimits}
 scale = 1.
 title = temperature (C) sliced through x=540 km
 axes = yz
+cmap = cmo.thermal
 
 [salinityYZ]
 limits = ${movies:Slimits}
 scale = 1.
 title = salinity (PSU) sliced through x=540 km
 axes = yz
+cmap = cmo.haline
