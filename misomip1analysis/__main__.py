@@ -14,8 +14,7 @@ from misomip1analysis.plot.movies import plot_movies
 
 def main():
 
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('configFiles', metavar='CONFIG',
                         type=str, nargs='*', help='config file')
     parser.add_argument('-v', '--version',
@@ -39,7 +38,6 @@ def main():
         print('WARNING: Did not find config.default.  Assuming other config '
               'file(s) contain a\n'
               'full set of configuration options.')
-        defaultConfig = None
         configFiles = args.configFiles
 
     config = ConfigParser(interpolation=ExtendedInterpolation())

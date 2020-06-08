@@ -1,26 +1,26 @@
-from misomip1analysis.models import load_datasets
-from misomip1analysis.util import string_to_list
-
 import os
 import numpy
 from progressbar import ProgressBar, Percentage, Bar, ETA
 import subprocess
 from distutils.spawn import find_executable
 
-import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+from matplotlib.cm import register_cmap
+
+from misomip1analysis.models import load_datasets
+from misomip1analysis.util import string_to_list
 
 
 def plot_movies(config):
-    '''
+    """
     Plot the all requested movies
 
     Parameters
     ----------
     config : ConfigParser
         config options
-    '''
+    """
 
     _register_ferret_colormap()
 
@@ -30,7 +30,7 @@ def plot_movies(config):
 
 
 def plot_movie(config, fieldName):
-    '''
+    """
     Plot the frames of a movie from a time-dependent, spatially 2D field and
     then create a movie using ffmpeg (if available)
 
@@ -41,7 +41,7 @@ def plot_movie(config, fieldName):
 
     fieldName : str
         A field in the model output that can be plotted as a movie
-    '''
+    """
 
     daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     secondsPerDay = 24.*60.*60.
@@ -81,7 +81,7 @@ def plot_movie(config, fieldName):
 
 
 def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
-    '''
+    """
     Plot the frames of a movie from a time-dependent, spatially 2D field and
     then create a movie using ffmpeg (if available)
 
@@ -98,7 +98,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
 
     time : float
         The time to plot (by finding the nearest index in the time coordinate)
-    '''
+    """
     framesFolder = config['movies']['framesFolder']
     framesFolder = '{}/{}'.format(framesFolder, fieldName)
     try:
@@ -109,7 +109,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     # the file name is the variable followed by the zero-padded time index
     imageFileName = '{}/{}_{:04d}.png'.format(framesFolder, fieldName,
                                               timeIndex)
-    if(os.path.exists(imageFileName)):
+    if os.path.exists(imageFileName):
         # the image exists so we're going to save time and not replot it
         return
 
@@ -157,6 +157,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
         axarray = axarray.reshape((rowCount, columnCount))
 
     lastImage = []
+    row = 0
     for panelIndex in range(len(modelIndices)):
         modelIndex = modelIndices[panelIndex]
         row = rowCount-1 - panelIndex//columnCount
@@ -234,14 +235,14 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
 
 
 def _plot_panel(ax, field, label, scale, lower, upper, extent, axes):
-    '''
+    """
     Plot a single panel for a given model in a movie frame
-    '''
+    """
 
     ax.set_adjustable('box')
 
     # aspect ratio
-    if(axes == 'xy'):
+    if axes == 'xy':
         # pixels are 1:1
         aspectRatio = None
     else:
@@ -258,7 +259,7 @@ def _plot_panel(ax, field, label, scale, lower, upper, extent, axes):
     im = ax.imshow(field, extent=extent, cmap='ferret', vmin=lower, vmax=upper,
                    aspect=aspectRatio, interpolation='nearest')
 
-    if(axes == 'xy'):
+    if axes == 'xy':
         # y axis will be upside down in imshow, which we don't want for xy
         ax.invert_yaxis()
         ax.text(350., 60., label, fontsize=12)
@@ -270,7 +271,7 @@ def _plot_panel(ax, field, label, scale, lower, upper, extent, axes):
 
 
 def _frames_to_movie(config, fieldName):
-    '''
+    """
     create a movie from frames using ffmpeg (if available)
 
     Parameters
@@ -280,7 +281,7 @@ def _frames_to_movie(config, fieldName):
 
     fieldName : str
         A field in the model output that can be plotted as a movie
-    '''
+    """
     section = config['ffmpeg']
     ffmpeg = section['path']
     if find_executable(ffmpeg) is None:
@@ -345,4 +346,4 @@ def _register_ferret_colormap():
                                                     N=255)
     cmap = plt.get_cmap(cmap)
     cmap.set_bad(backgroundColor)
-    matplotlib.cm.register_cmap(name='ferret', cmap=cmap)
+    register_cmap(name='ferret', cmap=cmap)

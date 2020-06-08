@@ -1,19 +1,19 @@
-from misomip1analysis.models import load_datasets
-from misomip1analysis.util import string_to_list
-
 import os
 import matplotlib.pyplot as plt
 
+from misomip1analysis.models import load_datasets
+from misomip1analysis.util import string_to_list
+
 
 def plot_metric_timeseries(config):
-    '''
+    """
     Plot a time series of a given metric for all models.
 
     Parameters
     ----------
     config : ConfigParser
         config options
-    '''
+    """
 
     experiment = config['experiment']['name']
 

@@ -1,13 +1,12 @@
 import xarray
 import numpy
+from collections import OrderedDict
 
 from misomip1analysis.util import string_to_list
 
-from collections import OrderedDict
-
 
 def load_datasets(config, variableList=None):
-    '''
+    """
     Load model data
 
     Parameters
@@ -26,7 +25,7 @@ def load_datasets(config, variableList=None):
 
     maxTime : int
         The value of nTime from the longest model data set
-    '''
+    """
 
     modelNames = string_to_list(config['models']['names'])
 
@@ -48,8 +47,7 @@ def load_datasets(config, variableList=None):
         ds = ds.set_coords(['time', 'x', 'y', 'z'])
 
         if variableList is not None:
-            dropList = [var for var in ds.data_vars if var not in variableList]
-            ds = ds.drop(dropList)
+            ds = ds[variableList]
         datasets[modelName] = ds
 
         # many MISOMIP output files don't have the _FillValue flag set properly
