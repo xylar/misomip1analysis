@@ -186,10 +186,10 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
         ranges = {}
         for coordName in ['x', 'y']:
             if coordName in ds:
-                ranges[coordName] = [1e-3*ds[coordName].min(),
-                                     1e-3*ds[coordName].max()]
+                ranges[coordName] = [1e-3*ds[coordName].min().values,
+                                     1e-3*ds[coordName].max().values]
         if 'z' in ds:
-            ranges['z'] = [ds.z.min(), ds.z.max()]
+            ranges['z'] = [ds.z.min().values, ds.z.max().values]
 
         extent = []
         for axis in axes:
@@ -271,9 +271,12 @@ def _plot_panel(ax, field, label, scale, lower, upper, extent, axes, cmap):
         # y axis will be upside down in imshow, which we don't want for xy
         ax.invert_yaxis()
         ax.text(350., 60., label, fontsize=12)
-    else:
+    elif axes == 'xz':
         # upside-down y axis is okay
         ax.text(350., -80., label, fontsize=12)
+    else:  # yz
+        # upside-down y axis is okay
+        ax.text(30., -80., label, fontsize=12)
 
     return im
 
