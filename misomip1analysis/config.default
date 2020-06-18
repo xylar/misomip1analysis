@@ -151,21 +151,21 @@ title = melt rate (m/a water equiv.)
 axes = xy
 
 # the name of the colormap
-cmap = cmo.balance
+cmap = cmo.curl
 
 [thermalDriving]
-limits = -1., 1.
+limits = -0.6, 1.8
 scale = 1.
 title = thermal driving (C)
 axes = xy
-cmap = cmo.balance
+cmap = thermal_driving
 
 [halineDriving]
-limits = -10., 10.
+limits = -4., 12.
 scale = 1.
 title = haline driving (PSU)
 axes = xy
-cmap = cmo.balance
+cmap = haline_driving
 
 [frictionVelocity]
 limits = 0, 0.02

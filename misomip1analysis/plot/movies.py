@@ -6,6 +6,7 @@ import subprocess
 import cmocean
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+from matplotlib import cm
 from matplotlib.cm import register_cmap
 
 from misomip1analysis.models import load_datasets
@@ -22,7 +23,7 @@ def plot_movies(config):
         config options
     """
 
-    _register_ferret_colormap()
+    _register_custom_colormaps()
 
     fieldNames = string_to_list(config['movies']['fields'])
 
@@ -175,6 +176,9 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
         modelName = modelNames[modelIndex]
         ds = datasets[modelName]
 
+        validTimes = numpy.nonzero(numpy.isfinite(ds.time.values))[0]
+        ds = ds.isel(nTime=validTimes)
+
         times = ds.time.values
         localTimeIndex = numpy.interp(time, times,
                                       numpy.arange(ds.sizes['nTime']))
@@ -316,7 +320,7 @@ def _frames_to_movie(config, fieldName):
         subprocess.check_call(args)
 
 
-def _register_ferret_colormap():
+def _register_custom_colormaps():
     red = numpy.array([[0, 0.6],
                        [0.15, 1],
                        [0.35, 1],
@@ -353,3 +357,17 @@ def _register_ferret_colormap():
     cmap = plt.get_cmap(cmap)
     cmap.set_bad(backgroundColor)
     register_cmap(name='ferret', cmap=cmap)
+
+    colors1 = cm.get_cmap('cmo.ice_r')(numpy.linspace(0., 0.9, 64))
+    colors2 = cm.get_cmap('cmo.solar')(numpy.linspace(0, 1, 192))
+    colorlist = numpy.vstack((colors1, colors2))
+    cmap = colors.LinearSegmentedColormap.from_list('ice_thermal', colorlist)
+    cmap.set_bad(backgroundColor)
+    register_cmap(name='thermal_driving', cmap=cmap)
+
+    colors1 = cm.get_cmap('cmo.curl')(numpy.linspace(0.5, 0.95, 64))
+    colors2 = cm.get_cmap('cmo.haline')(numpy.linspace(0, 1, 192))
+    colorlist = numpy.vstack((colors1, colors2))
+    cmap = colors.LinearSegmentedColormap.from_list('ice_haline', colorlist)
+    cmap.set_bad(backgroundColor)
+    register_cmap(name='haline_driving', cmap=cmap)
