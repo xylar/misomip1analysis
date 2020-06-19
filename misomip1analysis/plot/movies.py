@@ -125,6 +125,13 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
         cmap = section['cmap']
     else:
         cmap = 'ferret'
+
+    if 'norm' in section:
+        normType = section['norm']
+        assert normType in ['linear', 'symlog', 'log']
+    else:
+        normType = 'linear'
+
     lower, upper = [float(limit) for limit in
                     string_to_list(section['limits'])]
 
@@ -207,7 +214,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
         ax = axarray[row, col]
 
         im = _plot_panel(ax, ds[fieldName].values, '{:.2f} a'.format(year),
-                         scale, lower, upper, extent, axes, cmap)
+                         scale, lower, upper, extent, axes, cmap, normType)
 
         if row == rowCount-1:
             ax.set_xlabel(xLabel)
@@ -246,7 +253,8 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     plt.close()
 
 
-def _plot_panel(ax, field, label, scale, lower, upper, extent, axes, cmap):
+def _plot_panel(ax, field, label, scale, lower, upper, extent, axes, cmap,
+                normType):
     """
     Plot a single panel for a given model in a movie frame
     """
@@ -267,8 +275,19 @@ def _plot_panel(ax, field, label, scale, lower, upper, extent, axes, cmap):
 
     field = field*scale
 
+    if normType == 'symlog':
+        norm = colors.SymLogNorm(linthresh=lower, linscale=0.5, vmin=-upper,
+                                 vmax=upper, base=10.)
+    elif normType == 'log':
+        norm = colors.LogNorm(vmin=lower, vmax=upper)
+    elif normType == 'linear':
+        norm = colors.Normalize(vmin=lower, vmax=upper)
+    else:
+        raise ValueError('Unsupported norm type {}'.format(normType))
+
+
     # plot the data as an image
-    im = ax.imshow(field, extent=extent, cmap=cmap, vmin=lower, vmax=upper,
+    im = ax.imshow(field, extent=extent, cmap=cmap, norm=norm,
                    aspect=aspectRatio, interpolation='nearest')
 
     if axes == 'xy':
@@ -361,13 +380,31 @@ def _register_custom_colormaps():
     colors1 = cm.get_cmap('cmo.ice_r')(numpy.linspace(0., 0.9, 64))
     colors2 = cm.get_cmap('cmo.solar')(numpy.linspace(0, 1, 192))
     colorlist = numpy.vstack((colors1, colors2))
-    cmap = colors.LinearSegmentedColormap.from_list('ice_thermal', colorlist)
+    cmap = colors.LinearSegmentedColormap.from_list('thermal_driving',
+                                                    colorlist)
     cmap.set_bad(backgroundColor)
     register_cmap(name='thermal_driving', cmap=cmap)
 
     colors1 = cm.get_cmap('cmo.curl')(numpy.linspace(0.5, 0.95, 64))
     colors2 = cm.get_cmap('cmo.haline')(numpy.linspace(0, 1, 192))
     colorlist = numpy.vstack((colors1, colors2))
-    cmap = colors.LinearSegmentedColormap.from_list('ice_haline', colorlist)
+    cmap = colors.LinearSegmentedColormap.from_list('haline_driving',
+                                                    colorlist)
     cmap.set_bad(backgroundColor)
     register_cmap(name='haline_driving', cmap=cmap)
+
+    colors1 = cm.get_cmap('cmo.ice_r')(numpy.linspace(0., 0.9, 128))
+    colors2 = cm.get_cmap('cmo.solar')(numpy.linspace(0, 1, 128))
+    colorlist = numpy.vstack((colors1, colors2))
+    cmap = colors.LinearSegmentedColormap.from_list('thermal_driving_symlog',
+                                                    colorlist)
+    cmap.set_bad(backgroundColor)
+    register_cmap(name='thermal_driving_symlog', cmap=cmap)
+
+    colors1 = cm.get_cmap('cmo.curl')(numpy.linspace(0.5, 0.95, 128))
+    colors2 = cm.get_cmap('cmo.haline')(numpy.linspace(0, 1, 128))
+    colorlist = numpy.vstack((colors1, colors2))
+    cmap = colors.LinearSegmentedColormap.from_list('haline_driving_symlog',
+                                                    colorlist)
+    cmap.set_bad(backgroundColor)
+    register_cmap(name='haline_driving_symlog', cmap=cmap)

@@ -150,8 +150,16 @@ title = melt rate (m/a water equiv.)
 # axis of the plot (xy, xz or yz)
 axes = xy
 
-# the name of the colormap
+# the name of the colormap. Defaults to "ferret", a rainbow map (but no one
+# should use this!).  The default matplotlib colormaps are supported in addition
+# to cmocean and 5 custom maps: ferret, thermal_driving, haline_driving,
+# thermal_driving_symlog and haline_driving_symlog
 cmap = cmo.curl
+
+# The norm to use for the colormap, one of "linear", "log" or "symlog".  For
+# "symlog", the lower limit is the beginning of the linear range, which will
+# cover the equivalent of half a decade of the log portion. If none is specified
+norm = linear
 
 [thermalDriving]
 limits = -0.6, 1.8
@@ -159,6 +167,7 @@ scale = 1.
 title = thermal driving (C)
 axes = xy
 cmap = thermal_driving
+norm = linear
 
 [halineDriving]
 limits = -4., 12.
@@ -166,6 +175,7 @@ scale = 1.
 title = haline driving (PSU)
 axes = xy
 cmap = haline_driving
+norm = linear
 
 [frictionVelocity]
 limits = 0, 0.02
