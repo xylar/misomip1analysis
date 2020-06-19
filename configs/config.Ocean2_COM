@@ -1,0 +1,21 @@
+[experiment]
+name = Ocean2
+
+[models]
+names = COCO, FVCOM, MITgcm_BAS, MITgcm_BAS_Coupled, MITgcm_JPL, MOM6,
+        MOM6_SIGMA_ZSTAR, MPAS-Ocean, NEMO-CNRS, NEMO-UKESM1is, POP2x, ROMSUTAS
+
+[meltRate]
+limits = 0.1, 100.
+norm = symlog
+
+[thermalDriving]
+limits = 0.02, 1.8
+cmap = thermal_driving_symlog
+norm = symlog
+
+[halineDriving]
+limits = 0.1, 12.
+cmap = haline_driving_symlog
+norm = symlog
+

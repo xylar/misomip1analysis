@@ -97,6 +97,9 @@ for all of the possible config options you can change.
 vim config.Ocean0_COM
 ```
 
+Examples can be found in the [configs](https://github.com/xylar/misomip1analysis/blob/master/configs/)
+directory in the GitHub repo.
+
 #### 2.3 Run the analysis
 
 ``` bash

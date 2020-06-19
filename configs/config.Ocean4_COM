@@ -1,0 +1,33 @@
+[experiment]
+name = Ocean4
+setup = COM
+
+[models]
+names = MITgcm_BAS_Coupled, MITgcm_JPL, MOM6_SIGMA_ZSTAR, NEMO-CNRS,
+        NEMO-UKESM1is, POP2x
+
+[movies]
+Tlimits = -2.5, -1.5
+Slimits = 33.6, 34.8
+Vlimits = -0.2, 0.2
+
+[meltRate]
+limits = -1., 1.
+norm = linear
+
+[thermalDriving]
+limits = -0.01, 0.03
+norm = linear
+
+[halineDriving]
+limits = -0.1, 0.3
+norm = linear
+
+[frictionVelocity]
+limits = 0, 0.01
+
+[barotropicStreamfunction]
+limits = -0.15, 0.15
+
+[overturningStreamfunction]
+limits = -0.02, 0.02

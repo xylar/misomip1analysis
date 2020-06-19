@@ -1,0 +1,22 @@
+[experiment]
+name = Ocean2
+setup = TYP
+
+[models]
+names = FVCOM, MOM6, MPAS-Ocean, NEMO-CNRS, NEMO-UKESM1is, POP2x, ROMSUTAS,
+        ROMSUTAS_tides
+
+[meltRate]
+limits = 0.1, 100.
+norm = symlog
+
+[thermalDriving]
+limits = 0.02, 1.8
+cmap = thermal_driving_symlog
+norm = symlog
+
+[halineDriving]
+limits = 0.1, 12.
+cmap = haline_driving_symlog
+norm = symlog
+
