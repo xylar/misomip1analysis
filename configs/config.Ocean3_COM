@@ -1,0 +1,8 @@
+[experiment]
+name = Ocean3
+setup = COM
+
+[models]
+names = MITgcm_BAS_Coupled, MITgcm_JPL, MOM6_SIGMA_ZSTAR, NEMO-CNRS,
+        NEMO-UKESM1is, POP2x, ROMSUTAS
+

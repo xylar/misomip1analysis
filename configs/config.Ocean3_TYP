@@ -1,0 +1,7 @@
+[experiment]
+name = Ocean3
+setup = TYP
+
+[models]
+names = NEMO-UKESM1is, POP2x
+

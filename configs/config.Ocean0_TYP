@@ -1,0 +1,8 @@
+[experiment]
+name = Ocean0
+setup = TYP
+
+[models]
+names = FVCOM, MOM6, MPAS-Ocean, NEMO-CNRS, NEMO-UKESM1is, POP2x, ROMSUTAS,
+        ROMSUTAS_tides
+
