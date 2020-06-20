@@ -285,7 +285,6 @@ def _plot_panel(ax, field, label, scale, lower, upper, extent, axes, cmap,
     else:
         raise ValueError('Unsupported norm type {}'.format(normType))
 
-
     # plot the data as an image
     im = ax.imshow(field, extent=extent, cmap=cmap, norm=norm,
                    aspect=aspectRatio, interpolation='nearest')
