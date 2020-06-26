@@ -52,12 +52,14 @@ def plot_movie(config, fieldName):
     datasets, maxTime = load_datasets(config, variableList=[fieldName])
 
     movies = config['movies']
-    startTime = movies.getfloat('startYear')*secondsPerYear
+    startYear = movies.getfloat('startYear')
+    startTime = startYear*secondsPerYear
+    startYear = int(startYear)
     endTime = min(maxTime, (movies.getfloat('endYear')+1)*secondsPerYear)
 
     maxYear = int(numpy.ceil(maxTime/secondsPerYear))
     refTime = []
-    for year in range(maxYear+1):
+    for year in range(startYear, maxYear+1):
         refTime.append(year*secondsPerYear)
         for month in range(1, 12):
             refTime.append(refTime[-1]+daysPerMonth[month-1]*secondsPerDay)

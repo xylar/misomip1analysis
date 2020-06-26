@@ -113,14 +113,14 @@ fields = meltRate, thermalDriving, halineDriving, frictionVelocity,
 folder = analysis/${experiment:name}_${experiment:setup}
 
 # An output folder for movie frames (with each field going in a subfolder)
-framesFolder = analysis/${experiment:name}_${experiment:setup}/frames
+framesFolder = ${movies:folder}/frames
 
 # Temperature, salinity and velocity limits for color bars
 Tlimits = -2.5, 1.1
 Slimits = 33.6, 34.8
 Vlimits = -0.5, 0.5
 
-# Start and end year
+# Start and end year, where frame 0000 corresponds to the start year
 startYear = 0
 endYear = 10000
 
