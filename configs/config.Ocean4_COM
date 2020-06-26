@@ -3,7 +3,7 @@ name = Ocean4
 setup = COM
 
 [models]
-names = MITgcm_BAS_Coupled, MITgcm_JPL, MOM6_SIGMA_ZSTAR, NEMO-CNRS,
+names = MITgcm_BAS, MITgcm_JPL, MOM6_SIGMA_ZSTAR, NEMO-CNRS,
         NEMO-UKESM1is, POP2x
 
 [movies]

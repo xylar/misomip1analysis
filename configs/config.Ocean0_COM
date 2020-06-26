@@ -3,6 +3,6 @@ name = Ocean0
 setup = COM
 
 [models]
-names = COCO, FVCOM, MITgcm_BAS, MITgcm_BAS_Coupled, MITgcm_JPL, MOM6,
+names = COCO, FVCOM, MITgcm_BAS, MITgcm_JPL, MOM6,
         MOM6_SIGMA_ZSTAR, MPAS-Ocean, NEMO-CNRS, NEMO-UKESM1is, POP2x, ROMSUTAS
 
