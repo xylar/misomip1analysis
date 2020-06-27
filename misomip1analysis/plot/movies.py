@@ -171,6 +171,36 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     if rowCount == 1:
         axarray = axarray.reshape((rowCount, columnCount))
 
+    maxExtent = None
+    for modelName in modelNames:
+        ds = datasets[modelName]
+
+        # convert x and y to km
+        ranges = {}
+        for coordName in ['x', 'y']:
+            if coordName in ds:
+                ranges[coordName] = [1e-3*ds[coordName].min().values,
+                                     1e-3*ds[coordName].max().values]
+        if 'z' in ds:
+            ranges['z'] = [ds.z.min().values, ds.z.max().values]
+
+        extent = []
+        for axis in axes:
+            extent += ranges[axis]
+
+        if maxExtent is None:
+            maxExtent = extent
+        else:
+            maxExtent[0] = min(maxExtent[0], extent[0])
+            maxExtent[1] = max(maxExtent[1], extent[1])
+            maxExtent[2] = min(maxExtent[2], extent[2])
+            maxExtent[3] = max(maxExtent[3], extent[3])
+
+    if axes == 'xy':
+        # the y extent is max then min because the y axis then gets flipped
+        # (imshow is weird that way)
+        maxExtent = [maxExtent[0], maxExtent[1], maxExtent[3], maxExtent[2]]
+
     lastImage = []
     row = 0
     for panelIndex in range(len(modelIndices)):
@@ -195,28 +225,10 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
         ds = ds.isel(nTime=localTimeIndex)
         year = times[localTimeIndex]/config['constants'].getfloat('sPerYr')
 
-        # convert x and y to km
-        ranges = {}
-        for coordName in ['x', 'y']:
-            if coordName in ds:
-                ranges[coordName] = [1e-3*ds[coordName].min().values,
-                                     1e-3*ds[coordName].max().values]
-        if 'z' in ds:
-            ranges['z'] = [ds.z.min().values, ds.z.max().values]
-
-        extent = []
-        for axis in axes:
-            extent += ranges[axis]
-
-        if axes == 'xy':
-            # the y extent is max then min because the y axis then gets flipped
-            # (imshow is weird that way)
-            extent = [extent[0], extent[1], extent[3], extent[2]]
-
         ax = axarray[row, col]
 
         im = _plot_panel(ax, ds[fieldName].values, '{:.2f} a'.format(year),
-                         scale, lower, upper, extent, axes, cmap, normType)
+                         scale, lower, upper, maxExtent, axes, cmap, normType)
 
         if row == rowCount-1:
             ax.set_xlabel(xLabel)
