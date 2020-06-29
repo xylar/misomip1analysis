@@ -367,3 +367,80 @@ title = depth-mean y-velocity (m/a)
 axes = xy
 cmap = cmo.delta
 norm = symlog
+
+
+[gl_movies]
+## Options related to plotting data at the grounding line as movie frames and
+## making movies with ffmpeg
+
+# fields to plot
+fields =
+
+# An output folder for movie files
+folder = analysis/${experiment:name}_${experiment:setup}
+
+# An output folder for movie frames (with each field going in a subfolder)
+framesFolder = ${movies:folder}/frames
+
+# Temperature, salinity and velocity limits for color bars
+iceUlimits = 50., 2000.
+iceVlimits = 10., 500.
+
+# Start and end year, where frame 0000 corresponds to the start year
+startYear = 0
+endYear = 10000
+
+[iceThicknessGL]
+limits = 0., 2000.
+scale = 1.
+title = ice thickness (m)
+axes = xy
+cmap = cmo.deep_r
+
+[uBaseGL]
+limits = ${movies:iceUlimits}
+scale = ${constants:sPerYr}
+title = x-velocity (m/a) at ice base
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[vBaseGL]
+limits = ${movies:iceVlimits}
+scale = ${constants:sPerYr}
+title = y-velocity (m/a) at ice base
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[uSurfaceGL]
+limits = ${movies:iceUlimits}
+scale = ${constants:sPerYr}
+title = x-velocity (m/a) at ice surface
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[vSurfaceGL]
+limits = ${movies:iceVlimits}
+scale = ${constants:sPerYr}
+title = y-velocity (m/a) at ice surface
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[uMeanGL]
+limits = ${movies:iceUlimits}
+scale = ${constants:sPerYr}
+title = depth-mean x-velocity (m/a)
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[vMeanGL]
+limits = ${movies:iceVlimits}
+scale = ${constants:sPerYr}
+title = depth-mean y-velocity (m/a)
+axes = xy
+cmap = cmo.delta
+norm = symlog

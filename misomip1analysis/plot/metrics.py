@@ -19,6 +19,10 @@ def plot_metric_timeseries(config):
 
     metrics = config['metrics']
     metricNames = string_to_list(metrics['names'])
+    if metricNames[0] == '':
+        # nothing to plot
+        return
+
     plotFolder = metrics['folder']
 
     try:

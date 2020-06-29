@@ -25,3 +25,15 @@ fields = iceThickness, upperSurface, lowerSurface, basalMassBalance,
 # Start and end year
 startYear = 100
 endYear = 10000
+
+[gl_movies]
+## Options related to plotting time slices as movie frames and making movies
+## with ffmpeg
+
+# fields to plot
+fields = iceThicknessGL, uBaseGL, vBaseGL, uSurfaceGL, vSurfaceGL, uMeanGL,
+          vMeanGL
+
+# Start and end year
+startYear = 100
+endYear = 10000

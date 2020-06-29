@@ -22,3 +22,11 @@ fields = iceThickness, upperSurface, lowerSurface, basalMassBalance,
          groundedMask, floatingMask, basalTractionMagnitude, uBase, vBase,
          uSurface, vSurface, uMean, vMean
 
+
+[gl_movies]
+## Options related to plotting time slices as movie frames and making movies
+## with ffmpeg
+
+# fields to plot
+fields = iceThicknessGL, uBaseGL, vBaseGL, uSurfaceGL, vSurfaceGL, uMeanGL,
+          vMeanGL

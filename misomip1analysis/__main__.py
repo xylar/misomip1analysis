@@ -10,6 +10,7 @@ from configparser import ConfigParser, ExtendedInterpolation
 import misomip1analysis
 from misomip1analysis.plot.metrics import plot_metric_timeseries
 from misomip1analysis.plot.movies import plot_movies
+from misomip1analysis.plot.gl_movies import plot_movies as plot_gl_movies
 
 
 def main():
@@ -45,6 +46,7 @@ def main():
 
     plot_metric_timeseries(config)
     plot_movies(config)
+    plot_gl_movies(config)
 
 
 if __name__ == "__main__":
