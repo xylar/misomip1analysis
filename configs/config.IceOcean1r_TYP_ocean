@@ -1,0 +1,23 @@
+[experiment]
+name = IceOcean1r
+setup = TYP_ocean
+
+[models]
+names = UKESM1is
+
+[metrics]
+## Options related to global metrics
+
+# A comma-separated list of metrics to plot
+names = meanMeltRate, totalMeltFlux, totalOceanVolume, meanTemperature,
+        meanSalinity
+
+[movies]
+## Options related to plotting time slices as movie frames and making movies
+## with ffmpeg
+
+# fields to plot
+fields = meltRate, thermalDriving, halineDriving, frictionVelocity,
+         bottomTemperature, bottomSalinity, uBoundaryLayer, vBoundaryLayer,
+         barotropicStreamfunction, overturningStreamfunction, temperatureXZ,
+         salinityXZ, temperatureYZ, salinityYZ

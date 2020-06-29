@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'mpas_tools', '__init__.py')) as f:
+with open(os.path.join(here, 'misomip1analysis', '__init__.py')) as f:
     init_file = f.read()
 version = re.search(r'{}\s*=\s*[(]([^)]*)[)]'.format('__version_info__'),
                     init_file).group(1).replace(', ', '.')
@@ -32,6 +32,6 @@ setup(name='misomip1analysis',
       packages=find_packages(),
       package_data={'misomip1analysis': ['config.default']},
       install_requires=['numpy', 'scipy', 'matplotlib', 'netCDF4', 'xarray',
-                        'progressbar2'],
+                        'dask', 'progressbar2', 'cmocean'],
       entry_points={'console_scripts':
                     ['misomip1analysis = misomip1analysis.__main__:main']})

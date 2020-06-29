@@ -23,7 +23,7 @@ def plot_movies(config):
 
     register_custom_colormaps()
 
-    fieldNames = string_to_list(config['movies']['fields'])
+    fieldNames = string_to_list(config['gl_movies']['fields'])
 
     if fieldNames[0] == '':
         # nothing to plot
@@ -50,10 +50,10 @@ def plot_movie(config, fieldName):
     daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     secondsPerDay = 24.*60.*60.
     secondsPerYear = 365.*secondsPerDay
+    variableList = [fieldName, 'xGL', 'yGL']
+    datasets, maxTime = load_datasets(config, variableList=variableList)
 
-    datasets, maxTime = load_datasets(config, variableList=[fieldName])
-
-    movies = config['movies']
+    movies = config['gl_movies']
     startYear = movies.getfloat('startYear')
     startTime = startYear*secondsPerYear
     startYear = int(startYear)
@@ -105,7 +105,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     time : float
         The time to plot (by finding the nearest index in the time coordinate)
     """
-    framesFolder = config['movies']['framesFolder']
+    framesFolder = config['gl_movies']['framesFolder']
     framesFolder = '{}/{}'.format(framesFolder, fieldName)
     try:
         os.makedirs(framesFolder)
@@ -122,7 +122,6 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     modelNames = list(datasets.keys())
     modelCount = len(modelNames)
     section = config[fieldName]
-    axes = section['axes']
     title = section['title']
     scale = section.getfloat('scale')
     if 'cmap' in section:
@@ -140,25 +139,12 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
                     string_to_list(section['limits'])]
 
     timeCoords = [float(coord) for coord in string_to_list(
-        config['movies']['{}TimeCoords'.format(axes)])]
+        config['movies']['xyTimeCoords'])]
 
-    if axes == 'xy':
-        columnCount = min(3, modelCount)
-        xLabel = 'x (km)'
-        yLabel = 'y (km)'
-        rowScale = 1.2
-    elif axes == 'xz':
-        columnCount = min(4, modelCount)
-        rowScale = 2.0
-        xLabel = 'x (km)'
-        yLabel = 'z (m)'
-    elif axes == 'yz':
-        columnCount = min(4, modelCount)
-        rowScale = 2.0
-        xLabel = 'y (km)'
-        yLabel = 'z (m)'
-    else:
-        raise ValueError('Unknow axes value {}'.format(axes))
+    columnCount = min(3, modelCount)
+    xLabel = 'x (km)'
+    yLabel = 'y (km)'
+    rowScale = 1.2
 
     rowCount = (modelCount+columnCount-1)//columnCount
 
@@ -168,7 +154,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     figsize = [16, 0.5+rowScale*(rowCount+0.5)]
     fig, axarray = plt.subplots(rowCount, columnCount, sharex='col',
                                 sharey='row', figsize=figsize, dpi=100,
-                                facecolor='w')
+                                facecolor='w', subplot_kw=dict(aspect='equal'))
 
     if modelCount == 1:
         axarray = numpy.array(axarray)
@@ -176,7 +162,9 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     if rowCount == 1:
         axarray = axarray.reshape((rowCount, columnCount))
 
-    lastImage = []
+    plt.setp(axarray, xlim=[300., 640.], ylim=[0., 80.])
+
+    lastPanel = []
     row = 0
     for panelIndex in range(len(modelIndices)):
         modelIndex = modelIndices[panelIndex]
@@ -202,17 +190,8 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
 
         ax = axarray[row, col]
 
-        x = ds[axes[0]].values
-        if axes[0] in ['x', 'y']:
-            # convert to km
-            x = 1e-3*x
-        y = ds[axes[1]].values
-        if axes[1] in ['x', 'y']:
-            # convert to km
-            y = 1e-3*y
-
-        im = _plot_panel(ax, x, y, ds[fieldName].values, scale, lower, upper,
-                         axes, cmap, normType)
+        scatter = _plot_panel(ax, ds, fieldName, scale, lower, upper, cmap,
+                              normType)
 
         ax.text(timeCoords[0], timeCoords[1], '{:.2f} a'.format(year),
                 fontsize=12)
@@ -221,7 +200,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
             ax.set_xlabel(xLabel)
 
         if col == columnCount-1:
-            lastImage.append(im)
+            lastPanel.append(scatter)
 
         if col == 0:
             ax.set_ylabel(yLabel)
@@ -242,7 +221,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     top = pos0.y0 + pos0.height
     height = top - pos1.y0
     cbar_ax = fig.add_axes([0.92, pos1.y0, 0.02, height])
-    cbar = fig.colorbar(lastImage[row], cax=cbar_ax)
+    cbar = fig.colorbar(lastPanel[row], cax=cbar_ax)
     if rowCount == 1:
         for label in cbar.ax.yaxis.get_ticklabels()[1::2]:
             label.set_visible(False)
@@ -255,16 +234,21 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     plt.close()
 
 
-def _plot_panel(ax, x, y, field, scale, lower, upper, axes, cmap, normType):
+def _plot_panel(ax, ds, fieldName, scale, lower, upper, cmap, normType):
     """
     Plot a single panel for a given model in a movie frame
     """
 
-    X, Y = _interp_extrap_corners(x, y)
+    ax.set_adjustable('box')
+
+    ds = ds.where(ds[fieldName].notnull(), drop=True)
+
+    field = ds[fieldName].values
+    x = 1e-3*ds['xGL'].values
+    y = 1e-3*ds['yGL'].values
 
     # convert from float32 to float64 to avoid overflow/underflow problems
-    field = numpy.ma.masked_array(field, mask=numpy.isnan(field),
-                                  dtype=float)
+    field = numpy.array(field, dtype=float)
 
     field = field*scale
 
@@ -278,31 +262,13 @@ def _plot_panel(ax, x, y, field, scale, lower, upper, axes, cmap, normType):
     else:
         raise ValueError('Unsupported norm type {}'.format(normType))
 
+    size = 9
+
     # plot the data as an image
-    im = ax.pcolormesh(X, Y, field, cmap=cmap, norm=norm,
-                       shading='flat')
+    scatter = ax.scatter(x, y, s=size, c=field, marker='o', cmap=cmap,
+                         norm=norm)
 
-    if axes == 'xy':
-        ax.set_aspect('equal', adjustable='box')
-    else:
-        ax.set_aspect('auto', adjustable='box')
-
-    return im
-
-
-def _interp_extrap_corners(x, y):
-    x_corner = numpy.zeros(len(x)+1)
-    y_corner = numpy.zeros(len(y)+1)
-    x_corner[1:-1] = 0.5*(x[0:-1] + x[1:])
-    x_corner[0] = 1.5*x[0] - 0.5*x[1]
-    x_corner[-1] = 1.5*x[-1] - 0.5*x[-2]
-
-    y_corner[1:-1] = 0.5*(y[0:-1] + y[1:])
-    y_corner[0] = 1.5*y[0] - 0.5*y[1]
-    y_corner[-1] = 1.5*y[-1] - 0.5*y[-2]
-
-    X, Y = numpy.meshgrid(x, y)
-    return X, Y
+    return scatter
 
 
 def _frames_to_movie(config, fieldName):
@@ -320,12 +286,12 @@ def _frames_to_movie(config, fieldName):
     section = config['ffmpeg']
 
     experiment = config['experiment']['name']
-    movieFolder = config['movies']['folder']
+    movieFolder = config['gl_movies']['folder']
     try:
         os.makedirs(movieFolder)
     except OSError:
         pass
-    framesFolder = config['movies']['framesFolder']
+    framesFolder = config['gl_movies']['framesFolder']
     framesTemplate = '{}/{}/{}_%04d.png'.format(framesFolder, fieldName,
                                                 fieldName)
 

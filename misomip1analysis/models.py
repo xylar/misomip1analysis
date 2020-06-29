@@ -41,10 +41,12 @@ def load_datasets(config, variableList=None):
     for modelName in modelNames:
         fileName = '{}/{}_{}{}.nc'.format(modelName, experimentName,
                                           setupPrefix, modelName)
+        print('Reading data for {}'.format(modelName))
 
         ds = xarray.open_dataset(fileName, mask_and_scale=True, decode_cf=True,
                                  decode_times=False, engine='netcdf4')
-        ds = ds.set_coords(['time', 'x', 'y', 'z'])
+        ds = ds.set_coords([coord for coord in ['time', 'x', 'y', 'z']
+                            if coord in ds])
 
         if variableList is not None:
             ds = ds[variableList]

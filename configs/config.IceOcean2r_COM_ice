@@ -1,0 +1,34 @@
+[experiment]
+name = IceOcean2r
+setup = COM_ice
+
+[models]
+names = POPSICLES-Tsai, POPSICLES-Weertman
+
+[metrics]
+## Options related to global metrics
+
+# A comma-separated list of metrics to plot
+names = groundedArea, iceVAF, iceVolume
+
+
+[movies]
+## Options related to plotting time slices as movie frames and making movies
+## with ffmpeg
+
+# fields to plot
+fields = iceThickness, upperSurface, lowerSurface, basalMassBalance,
+         groundedMask, floatingMask, basalTractionMagnitude, uBase, vBase,
+         uSurface, vSurface, uMean, vMean
+
+# The location of the lower right corner of the text showing the current time
+xyTimeCoords = 650., 50.
+
+
+[gl_movies]
+## Options related to plotting time slices as movie frames and making movies
+## with ffmpeg
+
+# fields to plot
+fields = iceThicknessGL, uBaseGL, vBaseGL, uSurfaceGL, vSurfaceGL, uMeanGL,
+          vMeanGL

@@ -98,6 +98,21 @@ semilog = False
 scale = 1.
 title = mean salinity (PSU)
 
+[groundedArea]
+semilog = False
+scale = 1e-9
+title = grounded area (1000 km$$^2$$)
+
+[iceVAF]
+semilog = False
+scale = 1e-12
+title = ice volume above flotation (1000 km$$^3$$)
+
+[iceVolume]
+semilog = False
+scale = 1e-12
+title = ice volume (1000 km$$^3$$)
+
 
 [movies]
 ## Options related to plotting time slices as movie frames and making movies
@@ -113,16 +128,23 @@ fields = meltRate, thermalDriving, halineDriving, frictionVelocity,
 folder = analysis/${experiment:name}_${experiment:setup}
 
 # An output folder for movie frames (with each field going in a subfolder)
-framesFolder = analysis/${experiment:name}_${experiment:setup}/frames
+framesFolder = ${movies:folder}/frames
 
 # Temperature, salinity and velocity limits for color bars
 Tlimits = -2.5, 1.1
 Slimits = 33.6, 34.8
-Vlimits = -0.5, 0.5
+oceanVlimits = -0.5, 0.5
+iceUlimits = 50., 2000.
+iceVlimits = 10., 500.
 
-# Start and end year
+# Start and end year, where frame 0000 corresponds to the start year
 startYear = 0
 endYear = 10000
+
+# The location of the lower right corner of the text showing the current time
+xyTimeCoords = 350., 60.
+xzTimeCoords = 350., -80.
+yzTimeCoords = 30., -80.
 
 [ffmpeg]
 ## Options related to converting frames to movies wiht ffmpeg
@@ -199,14 +221,14 @@ axes = xy
 cmap = cmo.haline
 
 [uBoundaryLayer]
-limits = ${movies:Vlimits}
+limits = ${movies:oceanVlimits}
 scale = 1.
 title = x-velocity (m/s) in the sub-shelf boundary layer
 axes = xy
 cmap = cmo.delta
 
 [vBoundaryLayer]
-limits = ${movies:Vlimits}
+limits = ${movies:oceanVlimits}
 scale = 1.
 title = y-velocity (m/s) in the sub-shelf boundary layer
 axes = xy
@@ -253,3 +275,180 @@ scale = 1.
 title = salinity (PSU) sliced through x=540 km
 axes = yz
 cmap = cmo.haline
+
+[iceThickness]
+limits = 0., 2000.
+scale = 1.
+title = ice thickness (m)
+axes = xy
+cmap = cmo.deep_r
+
+[upperSurface]
+limits = 0, 1500.
+scale = 1.
+title = ice upper surface elevation (m)
+axes = xy
+cmap = cmo.deep_r
+
+[lowerSurface]
+limits = -700., 300.
+scale = 1.
+title = ice lower surface elevation (m)
+axes = xy
+cmap = cmo.deep_r
+
+[basalMassBalance]
+limits = -100., 100.
+scale = ${constants:meltRateScale}
+title = basal mass balance (m/a of ice)
+axes = xy
+cmap = cmo.curl
+
+[groundedMask]
+limits = 0., 1.
+scale = 1.
+title = grounded mask
+axes = xy
+cmap = magma
+
+[floatingMask]
+limits = 0., 1.
+scale = 1.
+title = floating mask
+axes = xy
+cmap = magma
+
+[basalTractionMagnitude]
+limits = 0., 100.
+scale = 1e-3
+title = magnitude of basal traction (kPa)
+axes = xy
+cmap = cmo.curl
+
+[uBase]
+limits = ${movies:iceUlimits}
+scale = ${constants:sPerYr}
+title = x-velocity (m/a) at ice base
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[vBase]
+limits = ${movies:iceVlimits}
+scale = ${constants:sPerYr}
+title = y-velocity (m/a) at ice base
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[uSurface]
+limits = ${movies:iceUlimits}
+scale = ${constants:sPerYr}
+title = x-velocity (m/a) at ice surface
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[vSurface]
+limits = ${movies:iceVlimits}
+scale = ${constants:sPerYr}
+title = y-velocity (m/a) at ice surface
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[uMean]
+limits = ${movies:iceUlimits}
+scale = ${constants:sPerYr}
+title = depth-mean x-velocity (m/a)
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[vMean]
+limits = ${movies:iceVlimits}
+scale = ${constants:sPerYr}
+title = depth-mean y-velocity (m/a)
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+
+[gl_movies]
+## Options related to plotting data at the grounding line as movie frames and
+## making movies with ffmpeg
+
+# fields to plot
+fields =
+
+# An output folder for movie files
+folder = analysis/${experiment:name}_${experiment:setup}
+
+# An output folder for movie frames (with each field going in a subfolder)
+framesFolder = ${movies:folder}/frames
+
+# Temperature, salinity and velocity limits for color bars
+iceUlimits = 50., 2000.
+iceVlimits = 10., 500.
+
+# Start and end year, where frame 0000 corresponds to the start year
+startYear = 0
+endYear = 10000
+
+# The location of the lower right corner of the text showing the current time
+xyTimeCoords = 610., 60.
+
+[iceThicknessGL]
+limits = 0., 2000.
+scale = 1.
+title = ice thickness (m)
+axes = xy
+cmap = cmo.deep_r
+
+[uBaseGL]
+limits = ${movies:iceUlimits}
+scale = ${constants:sPerYr}
+title = x-velocity (m/a) at ice base
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[vBaseGL]
+limits = ${movies:iceVlimits}
+scale = ${constants:sPerYr}
+title = y-velocity (m/a) at ice base
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[uSurfaceGL]
+limits = ${movies:iceUlimits}
+scale = ${constants:sPerYr}
+title = x-velocity (m/a) at ice surface
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[vSurfaceGL]
+limits = ${movies:iceVlimits}
+scale = ${constants:sPerYr}
+title = y-velocity (m/a) at ice surface
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[uMeanGL]
+limits = ${movies:iceUlimits}
+scale = ${constants:sPerYr}
+title = depth-mean x-velocity (m/a)
+axes = xy
+cmap = cmo.delta
+norm = symlog
+
+[vMeanGL]
+limits = ${movies:iceVlimits}
+scale = ${constants:sPerYr}
+title = depth-mean y-velocity (m/a)
+axes = xy
+cmap = cmo.delta
+norm = symlog

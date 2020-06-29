@@ -8,15 +8,11 @@ source:
     path: ..
 
 build:
-    number: 0
+    number: 1
     script: {{ PYTHON }} -m pip install . --no-deps -vv
     noarch: python
-
-test:
-    imports:
-        - misomip1analysis
-    commands:
-        - misomip1analysis --version
+    entry_points:
+        - misomip1analysis = misomip1analysis.__main__:main
 
 requirements:
     host:
@@ -29,9 +25,16 @@ requirements:
         - matplotlib
         - netcdf4
         - xarray
+        - dask
         - progressbar2
         - ffmpeg
         - cmocean
+
+test:
+    imports:
+        - misomip1analysis
+    commands:
+        - misomip1analysis --version
 
 about:
     home:  http://gitub.com/xylar/misomip1analysis
@@ -42,4 +45,3 @@ about:
 extra:
     recipe-maintainers:
         - xylar
-

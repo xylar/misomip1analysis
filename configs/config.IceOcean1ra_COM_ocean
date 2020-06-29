@@ -1,0 +1,28 @@
+[experiment]
+name = IceOcean1ra
+setup = COM_ocean
+
+[models]
+names = ElmerIce-NEMO, ElmerIce-ROMS, ISSM-MITgcm, MITgcm-STREAMICE, MITgcm-Ua,
+        MOM6-CISM, POPSICLES-Tsai, POPSICLES-Weertman, UKESM1is
+
+[metrics]
+## Options related to global metrics
+
+# A comma-separated list of metrics to plot
+names = meanMeltRate, totalMeltFlux, totalOceanVolume, meanTemperature,
+        meanSalinity
+
+[movies]
+## Options related to plotting time slices as movie frames and making movies
+## with ffmpeg
+
+# fields to plot
+fields = meltRate, thermalDriving, halineDriving, frictionVelocity,
+         bottomTemperature, bottomSalinity, uBoundaryLayer, vBoundaryLayer,
+         barotropicStreamfunction, overturningStreamfunction, temperatureXZ,
+         salinityXZ, temperatureYZ, salinityYZ
+
+# Start and end year
+startYear = 100
+endYear = 10000
