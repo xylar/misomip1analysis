@@ -1,0 +1,23 @@
+[experiment]
+name = IceOcean2r
+setup = COM_ocean
+
+[models]
+names = POPSICLES-Tsai, POPSICLES-Weertman
+
+[metrics]
+## Options related to global metrics
+
+# A comma-separated list of metrics to plot
+names = meanMeltRate, totalMeltFlux, totalOceanVolume, meanTemperature,
+        meanSalinity
+
+[movies]
+## Options related to plotting time slices as movie frames and making movies
+## with ffmpeg
+
+# fields to plot
+fields = meltRate, thermalDriving, halineDriving, frictionVelocity,
+         bottomTemperature, bottomSalinity, uBoundaryLayer, vBoundaryLayer,
+         barotropicStreamfunction, overturningStreamfunction, temperatureXZ,
+         salinityXZ, temperatureYZ, salinityYZ
