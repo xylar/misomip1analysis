@@ -29,7 +29,7 @@ git reset --hard origin/add_analysis
 Create an env. for running the code:
 ``` bash
 conda create -n misomip python=3.8 xarray dask netcdf4 numpy scipy \
-    matplotlib progressbar2 ffmpeg
+    matplotlib progressbar2 ffmpeg cmocean
 ```
 
 ### 1.4. download or link to results
