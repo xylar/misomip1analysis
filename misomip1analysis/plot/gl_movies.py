@@ -138,6 +138,9 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     lower, upper = [float(limit) for limit in
                     string_to_list(section['limits'])]
 
+    timeCoords = [float(coord) for coord in string_to_list(
+        config['movies']['xyTimeCoords'])]
+
     columnCount = min(3, modelCount)
     xLabel = 'x (km)'
     yLabel = 'y (km)'
@@ -187,8 +190,11 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
 
         ax = axarray[row, col]
 
-        scatter = _plot_panel(ax, ds, fieldName, '{:.2f} a'.format(year),
-                              scale, lower, upper, cmap, normType)
+        scatter = _plot_panel(ax, ds, fieldName, scale, lower, upper, cmap,
+                              normType)
+
+        ax.text(timeCoords[0], timeCoords[1], '{:.2f} a'.format(year),
+                fontsize=12)
 
         if row == rowCount-1:
             ax.set_xlabel(xLabel)
@@ -202,7 +208,8 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
                 label.set_visible(False)
 
         ax.set_title(modelNames[modelIndex])
-        plt.tight_layout()
+
+    plt.tight_layout()
 
     fig.subplots_adjust(right=0.91)
     if rowCount == 1:
@@ -227,7 +234,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     plt.close()
 
 
-def _plot_panel(ax, ds, fieldName, label, scale, lower, upper, cmap, normType):
+def _plot_panel(ax, ds, fieldName, scale, lower, upper, cmap, normType):
     """
     Plot a single panel for a given model in a movie frame
     """
@@ -260,7 +267,6 @@ def _plot_panel(ax, ds, fieldName, label, scale, lower, upper, cmap, normType):
     # plot the data as an image
     scatter = ax.scatter(x, y, s=size, c=field, marker='o', cmap=cmap, norm=norm)
 
-    ax.text(350., 60., label, fontsize=12)
     return scatter
 
 

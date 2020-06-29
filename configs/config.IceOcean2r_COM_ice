@@ -21,6 +21,9 @@ fields = iceThickness, upperSurface, lowerSurface, basalMassBalance,
          groundedMask, floatingMask, basalTractionMagnitude, uBase, vBase,
          uSurface, vSurface, uMean, vMean
 
+# The location of the lower right corner of the text showing the current time
+xyTimeCoords = 650., 50.
+
 
 [gl_movies]
 ## Options related to plotting time slices as movie frames and making movies

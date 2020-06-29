@@ -141,6 +141,11 @@ iceVlimits = 10., 500.
 startYear = 0
 endYear = 10000
 
+# The location of the lower right corner of the text showing the current time
+xyTimeCoords = 350., 60.
+xzTimeCoords = 350., -80.
+yzTimeCoords = 30., -80.
+
 [ffmpeg]
 ## Options related to converting frames to movies wiht ffmpeg
 
@@ -389,6 +394,9 @@ iceVlimits = 10., 500.
 # Start and end year, where frame 0000 corresponds to the start year
 startYear = 0
 endYear = 10000
+
+# The location of the lower right corner of the text showing the current time
+xyTimeCoords = 610., 60.
 
 [iceThicknessGL]
 limits = 0., 2000.

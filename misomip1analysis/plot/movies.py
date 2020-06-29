@@ -139,6 +139,9 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     lower, upper = [float(limit) for limit in
                     string_to_list(section['limits'])]
 
+    timeCoords = [float(coord) for coord in string_to_list(
+        config['movies']['{}TimeCoords'.format(axes)])]
+
     if axes == 'xy':
         columnCount = min(3, modelCount)
         xLabel = 'x (km)'
@@ -173,36 +176,6 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     if rowCount == 1:
         axarray = axarray.reshape((rowCount, columnCount))
 
-    maxExtent = None
-    for modelName in modelNames:
-        ds = datasets[modelName]
-
-        # convert x and y to km
-        ranges = {}
-        for coordName in ['x', 'y']:
-            if coordName in ds:
-                ranges[coordName] = [1e-3*ds[coordName].min().values,
-                                     1e-3*ds[coordName].max().values]
-        if 'z' in ds:
-            ranges['z'] = [ds.z.min().values, ds.z.max().values]
-
-        extent = []
-        for axis in axes:
-            extent += ranges[axis]
-
-        if maxExtent is None:
-            maxExtent = extent
-        else:
-            maxExtent[0] = min(maxExtent[0], extent[0])
-            maxExtent[1] = max(maxExtent[1], extent[1])
-            maxExtent[2] = min(maxExtent[2], extent[2])
-            maxExtent[3] = max(maxExtent[3], extent[3])
-
-    if axes == 'xy':
-        # the y extent is max then min because the y axis then gets flipped
-        # (imshow is weird that way)
-        maxExtent = [maxExtent[0], maxExtent[1], maxExtent[3], maxExtent[2]]
-
     lastImage = []
     row = 0
     for panelIndex in range(len(modelIndices)):
@@ -229,8 +202,20 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
 
         ax = axarray[row, col]
 
-        im = _plot_panel(ax, ds[fieldName].values, '{:.2f} a'.format(year),
-                         scale, lower, upper, maxExtent, axes, cmap, normType)
+        x = ds[axes[0]].values
+        if axes[0] in ['x', 'y']:
+            # convert to km
+            x = 1e-3*x
+        y = ds[axes[1]].values
+        if axes[1] in ['x', 'y']:
+            # convert to km
+            y = 1e-3*y
+
+        im = _plot_panel(ax, x, y, ds[fieldName].values, scale, lower, upper,
+                         axes, cmap, normType)
+
+        ax.text(timeCoords[0], timeCoords[1], '{:.2f} a'.format(year),
+                fontsize=12)
 
         if row == rowCount-1:
             ax.set_xlabel(xLabel)
@@ -244,7 +229,8 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
                 label.set_visible(False)
 
         ax.set_title(modelNames[modelIndex])
-        plt.tight_layout()
+
+    plt.tight_layout()
 
     fig.subplots_adjust(right=0.91)
     if rowCount == 1:
@@ -269,21 +255,12 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
     plt.close()
 
 
-def _plot_panel(ax, field, label, scale, lower, upper, extent, axes, cmap,
-                normType):
+def _plot_panel(ax, x, y, field, scale, lower, upper, axes, cmap, normType):
     """
     Plot a single panel for a given model in a movie frame
     """
 
-    ax.set_adjustable('box')
-
-    # aspect ratio
-    if axes == 'xy':
-        # pixels are 1:1
-        aspectRatio = None
-    else:
-        # stretch the axes to fill the plot area
-        aspectRatio = 'auto'
+    X, Y = _interp_extrap_corners(x, y)
 
     # convert from float32 to float64 to avoid overflow/underflow problems
     field = numpy.ma.masked_array(field, mask=numpy.isnan(field),
@@ -302,21 +279,30 @@ def _plot_panel(ax, field, label, scale, lower, upper, extent, axes, cmap,
         raise ValueError('Unsupported norm type {}'.format(normType))
 
     # plot the data as an image
-    im = ax.imshow(field, extent=extent, cmap=cmap, norm=norm,
-                   aspect=aspectRatio, interpolation='nearest')
+    im = ax.pcolormesh(X, Y, field, cmap=cmap, norm=norm,
+                       shading='flat')
 
     if axes == 'xy':
-        # y axis will be upside down in imshow, which we don't want for xy
-        ax.invert_yaxis()
-        ax.text(350., 60., label, fontsize=12)
-    elif axes == 'xz':
-        # upside-down y axis is okay
-        ax.text(350., -80., label, fontsize=12)
-    else:  # yz
-        # upside-down y axis is okay
-        ax.text(30., -80., label, fontsize=12)
+        ax.set_aspect('equal', adjustable='box')
+    else:
+        ax.set_aspect('auto', adjustable='box')
 
     return im
+
+
+def _interp_extrap_corners(x, y):
+    x_corner = numpy.zeros(len(x)+1)
+    y_corner = numpy.zeros(len(y)+1)
+    x_corner[1:-1] = 0.5*(x[0:-1] + x[1:])
+    x_corner[0] = 1.5*x[0] - 0.5*x[1]
+    x_corner[-1] = 1.5*x[-1] - 0.5*x[-2]
+
+    y_corner[1:-1] = 0.5*(y[0:-1] + y[1:])
+    y_corner[0] = 1.5*y[0] - 0.5*y[1]
+    y_corner[-1] = 1.5*y[-1] - 0.5*y[-2]
+
+    X, Y = numpy.meshgrid(x, y)
+    return X, Y
 
 
 def _frames_to_movie(config, fieldName):

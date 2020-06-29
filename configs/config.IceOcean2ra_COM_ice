@@ -25,6 +25,10 @@ fields = iceThickness, upperSurface, lowerSurface, basalMassBalance,
 startYear = 100
 endYear = 10000
 
+# The location of the lower right corner of the text showing the current time
+xyTimeCoords = 650., 50.
+
+
 [gl_movies]
 ## Options related to plotting time slices as movie frames and making movies
 ## with ffmpeg
