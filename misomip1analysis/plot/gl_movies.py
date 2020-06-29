@@ -265,7 +265,8 @@ def _plot_panel(ax, ds, fieldName, scale, lower, upper, cmap, normType):
     size = 9
 
     # plot the data as an image
-    scatter = ax.scatter(x, y, s=size, c=field, marker='o', cmap=cmap, norm=norm)
+    scatter = ax.scatter(x, y, s=size, c=field, marker='o', cmap=cmap,
+                         norm=norm)
 
     return scatter
 
