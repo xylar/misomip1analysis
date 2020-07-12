@@ -139,7 +139,7 @@ def _plot_time_slice(config, fieldName, datasets, time, timeIndex):
                     string_to_list(section['limits'])]
 
     timeCoords = [float(coord) for coord in string_to_list(
-        config['movies']['xyTimeCoords'])]
+        config['gl_movies']['xyTimeCoords'])]
 
     columnCount = min(3, modelCount)
     xLabel = 'x (km)'

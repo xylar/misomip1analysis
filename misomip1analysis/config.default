@@ -396,7 +396,7 @@ startYear = 0
 endYear = 10000
 
 # The location of the lower right corner of the text showing the current time
-xyTimeCoords = 610., 60.
+xyTimeCoords = 550., 50.
 
 [iceThicknessGL]
 limits = 0., 2000.

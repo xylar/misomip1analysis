@@ -33,3 +33,6 @@ xyTimeCoords = 650., 50.
 # fields to plot
 fields = iceThicknessGL, uBaseGL, vBaseGL, uSurfaceGL, vSurfaceGL, uMeanGL,
           vMeanGL
+
+# The location of the lower right corner of the text showing the current time
+xyTimeCoords = 550., 50.

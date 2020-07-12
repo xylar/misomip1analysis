@@ -40,3 +40,6 @@ fields = iceThicknessGL, uBaseGL, vBaseGL, uSurfaceGL, vSurfaceGL, uMeanGL,
 # Start and end year
 startYear = 100
 endYear = 10000
+
+# The location of the lower right corner of the text showing the current time
+xyTimeCoords = 550., 50.
